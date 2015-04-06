@@ -1,5 +1,6 @@
 module Network
-    ( get, get'
+    ( Response()
+    , get, get'
     , put, put'
     ) where
 
@@ -9,8 +10,13 @@ import Network.HTTP
 import Data.Array
 import Data.Function
 
--- Internal tuple type
+-- Internal type only used to ease JS interfacing
 data JsHeader = JsHeader String String
+
+-- A *good enough* reponse type
+type Response = { text   :: String
+                , status :: StatusCode
+                }
 
 foreign import sendImpl """
 function sendImpl(method, url, headers, data, callback) {
@@ -18,7 +24,10 @@ function sendImpl(method, url, headers, data, callback) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function() {
             if(request.readyState === 4) {
-               callback(request.response)();
+               callback({
+                   text:   request.responseText,
+                   status: request.status
+               })();
            }
         };
 
@@ -30,21 +39,21 @@ function sendImpl(method, url, headers, data, callback) {
         request.send(data);
     };
 }
-""" :: forall eff. Fn5 String String [JsHeader] String (String -> Eff eff Unit) (Eff eff Unit)
+""" :: forall eff. Fn5 String String [JsHeader] String (Response -> Eff eff Unit) (Eff eff Unit)
 
-send :: forall eff. Verb -> String -> [Header] -> String -> ContT Unit (Eff eff) String
+send :: forall eff. Verb -> String -> [Header] -> String -> ContT Unit (Eff eff) Response
 send verb url headers sendData = ContT $ runFn5 sendImpl (show verb) url (toJsHeader <$> headers) sendData
     where
         toJsHeader = \(Header h s) -> JsHeader (show h) s
 
-get :: forall eff. String -> [Header] -> String -> ContT Unit (Eff eff) String
+get :: forall eff. String -> [Header] -> String -> ContT Unit (Eff eff) Response
 get = send GET
 
-get' :: forall eff. String -> ContT Unit (Eff eff) String
+get' :: forall eff. String -> ContT Unit (Eff eff) Response
 get' url = get url [] ""
 
-put :: forall eff. String -> [Header] -> String -> ContT Unit (Eff eff) String
+put :: forall eff. String -> [Header] -> String -> ContT Unit (Eff eff) Response
 put = send PUT
 
-put' :: forall eff. String -> ContT Unit (Eff eff) String
+put' :: forall eff. String -> ContT Unit (Eff eff) Response
 put' url = put url [] ""

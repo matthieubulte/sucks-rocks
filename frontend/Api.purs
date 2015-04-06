@@ -15,16 +15,16 @@ import Types
 
 loadSnippet :: forall eff. Number -> ContT Unit (Eff eff) Snippet
 loadSnippet id = do
-    serializedSnippet <- get' $ "/snippet/" ++ (show id)
-    let deserializedSnippet = readJSON serializedSnippet :: F Snippet
+    response <- get' $ "/snippet/" ++ (show id)
+    let deserializedSnippet = readJSON response.text :: F Snippet
     case deserializedSnippet of
          (Right snippet) -> return snippet
 --       hu hu
 
 loadSnippets :: forall eff. ContT Unit (Eff eff) [Snippet]
 loadSnippets = do
-    serializedSnippets <- get' "/snippets"
-    let deserializedSnippets = readJSON serializedSnippets :: F [Snippet]
+    response <- get' "/snippets"
+    let deserializedSnippets = readJSON response.text :: F [Snippet]
     case deserializedSnippets of
          (Right snippets) -> return snippets
          (Left _)         -> return []
