@@ -22,19 +22,12 @@ loadSnippet :: forall eff. Number -> MaybeT (ContT Unit (Eff eff)) Snippet
 loadSnippet id = do
     response <- lift <<< get' $ "/snippet/" ++ (show id)
     guard $ response.status == 200
-
-    let deserializedSnippet = readJSON response.text :: F Snippet
-    case deserializedSnippet of
-         (Right snippet) -> return snippet
-         otherwise       -> empty
+    either (const empty) return $ readJSON response.text :: F Snippet
 
 loadSnippets :: forall eff. ContT Unit (Eff eff) [Snippet]
 loadSnippets = do
     response <- get' "/snippets"
-    let deserializedSnippets = readJSON response.text :: F [Snippet]
-    case deserializedSnippets of
-         (Right snippets) -> return snippets
-         (Left _)         -> return []
+    return $ either (const []) id $ readJSON response.text :: F [Snippet]
 
 mkVoteUrl :: String -> Number -> String
 mkVoteUrl v i = "/snippet/" ++ (show i) ++ "/" ++ v
