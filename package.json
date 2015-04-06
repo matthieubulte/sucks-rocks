@@ -1,0 +1,13 @@
+{
+  "name": "sucks-rocks",
+  "version": "0.0.1",
+  "description": "Does this code suck, or does it rock?",
+  "author": "Matthieu Bulté",
+  "license": "MIT",
+  "devDependencies": {
+    "bower": "^1.3.12",
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-purescript": "^0.6.0"
+  }
+}

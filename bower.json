@@ -1,0 +1,27 @@
+{
+  "name": "sucks-rocks",
+  "version": "0.0.1",
+  "authors": [
+    "Matthieu Bulté <matthieu.bulte.06@gmail.com>"
+  ],
+  "description": "Does this code suck, or does it rock?",
+  "license": "MIT",
+  "homepage": "https://github.com/mtthieubulte/sucks-rocks",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-thermite": "~0.5.3",
+    "react": "~0.12.2",
+    "purescript-foreign": "~0.4.2"
+  },
+  "devDependencies": {
+    "purescript-maybe": "~0.2.2",
+    "purescript-transformers": "~0.5.4"
+  }
+}

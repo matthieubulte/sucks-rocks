@@ -1,0 +1,9 @@
+.cabal-sandbox
+.psci
+bower_components/
+*.sqlite3
+dist/
+node_modules/
+npm-debug.log
+static/
+cabal.sandbox.config

@@ -1,0 +1,28 @@
+name:           sucks-rocks
+version:        0.0.1
+synopsis:       Does this code suck, or does it rock?
+homepage:       https://github.com/mtthieubulte/sucks-rocks
+license:        MIT
+author:         Matthieu Bulté
+maintainer:     matthieu.bulte.06@gmail.com
+category:       Web
+build-type:     Simple
+cabal-version:  >= 1.8
+
+executable sucks-rocks
+    main-is:            Main.hs
+    build-depends:      base                  ==4.7.*
+                      , mtl                   -any
+                      , transformers
+                      , resourcet
+                      , wai
+                      , wai-middleware-static
+                      , wai-extra
+                      , warp
+                      , http-types
+                      , scotty
+                      , aeson
+                      , persistent ==2.1.*
+                      , persistent-template ==2.1.*
+                      , persistent-sqlite ==2.1.*
+                      , monad-logger
