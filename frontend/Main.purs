@@ -4,12 +4,10 @@ import Network
 import Types
 import Api
 import Views
+import Utils
 
-import Data.Maybe
 import Control.Monad.Trans
 import Control.Monad.Cont.Trans
-import Control.Monad.Maybe.Trans
-import Control.Monad.Eff
 
 import qualified Thermite as T
 import qualified Thermite.Action as T
@@ -17,12 +15,7 @@ import qualified Thermite.Events as T
 import qualified Thermite.Types as T
 
 setState = T.asyncSetState <<< runContT
-
-maybeSetState s m = setState $ do
-    maybeState <- runMaybeT m
-    case maybeState of
-         (Just state) -> return state
-         Nothing      -> return s
+maybeSetState s = setState <<< fromMaybeT s
 
 voteAndReload vote (Snippet snippet) = maybeSetState (snippetNotFound snippet.id) $ do
     lift $ vote snippet.id
