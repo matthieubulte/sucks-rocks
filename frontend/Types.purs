@@ -3,7 +3,7 @@ module Types
     , AppState(..)
     , SnippetRecord()
     , Snippet(..)
-    , State(..), loading, allSnippets, oneSnippet
+    , State(..), loading, allSnippets, oneSnippet, snippetNotFound
     ) where
 
 import Data.Foreign
@@ -35,6 +35,7 @@ data Action = LoadAllSnippets
 data AppState = Loading
               | AllSnippets [Snippet]
               | OneSnippet Snippet
+              | SnippetNotFound Number
 
 data State = State AppState
 
@@ -46,3 +47,6 @@ allSnippets = State <<< AllSnippets
 
 oneSnippet :: Snippet -> State
 oneSnippet = State <<< OneSnippet
+
+snippetNotFound :: Number -> State
+snippetNotFound = State <<< SnippetNotFound

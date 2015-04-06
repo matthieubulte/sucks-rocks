@@ -7,19 +7,26 @@ module Api
 
 import Control.Monad.Eff
 import Control.Monad.Cont.Trans
+import Control.Monad.Maybe.Trans
+import Control.Monad.Trans
+import Control.Plus
+import Control.MonadPlus
 import Data.Either
 import Data.Foreign
 import Data.Foreign.Class
+import Data.Maybe
 import Network
 import Types
 
-loadSnippet :: forall eff. Number -> ContT Unit (Eff eff) Snippet
+loadSnippet :: forall eff. Number -> MaybeT (ContT Unit (Eff eff)) Snippet
 loadSnippet id = do
-    response <- get' $ "/snippet/" ++ (show id)
+    response <- lift <<< get' $ "/snippet/" ++ (show id)
+    guard $ response.status == 200
+
     let deserializedSnippet = readJSON response.text :: F Snippet
     case deserializedSnippet of
          (Right snippet) -> return snippet
---       hu hu
+         otherwise       -> empty
 
 loadSnippets :: forall eff. ContT Unit (Eff eff) [Snippet]
 loadSnippets = do

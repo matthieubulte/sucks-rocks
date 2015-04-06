@@ -15,12 +15,17 @@ render context (State state) props = T.div' [rendered]
   where
       rendered = case state of
                       Loading                -> loadingView
+                      (SnippetNotFound id)   -> renderSnippetNotFound id
                       (OneSnippet snippet)   -> renderOneSnippet context snippet props
                       (AllSnippets snippets) -> renderAllSnippets context snippets props
 
 -- State : Loading
 loadingView :: T.Html _
 loadingView = T.text "Loading ..."
+
+-- State : Snippet Not Found
+renderSnippetNotFound :: Number -> T.Html _
+renderSnippetNotFound id = T.text $ "Couldn't find snippet with id '" ++ (show id) ++ "'"
 
 -- State : One Snippet
 peopleThinkIt :: Number -> String -> T.Html _

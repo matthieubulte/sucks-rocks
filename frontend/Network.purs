@@ -15,7 +15,7 @@ data JsHeader = JsHeader String String
 
 -- A *good enough* reponse type
 type Response = { text   :: String
-                , status :: StatusCode
+                , status :: Number
                 }
 
 foreign import sendImpl """
