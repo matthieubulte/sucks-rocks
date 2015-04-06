@@ -30,7 +30,7 @@ loadSnippets = do
          (Left _)         -> return []
 
 mkVoteUrl :: String -> Number -> String
-mkVoteUrl v i = "/" ++ (show i) ++ "/" ++ v
+mkVoteUrl v i = "/snippet/" ++ (show i) ++ "/" ++ v
 
 voteSnippet :: forall eff. String -> Number -> ContT Unit (Eff eff) Unit
 voteSnippet vote id = do

@@ -76,20 +76,21 @@ serve port = S.scotty port $ do
       snippets <- liftIO $ getSnippets 10 0
       S.json $ snippetEntityToJson <$> snippets
 
+    S.put "/snippet/:id/rocks" $ do
+        _id <- S.param "id"
+        liftIO . runDb $ update (mkSnippetId _id) [SnippetRocks +=. 1]
+
+    S.put "/snippet/:id/sucks" $ do
+        _id <- S.param "id"
+        liftIO . runDb $ update (mkSnippetId _id) [SnippetSucks +=. 1]
+
+
     S.get "/snippet/:id" $ do
         _id <- S.param "id"
         snippet <- liftIO $ getSnippetById (mkSnippetId _id)
         case snippet of
              Nothing  -> status status404
              (Just s) -> S.json $ snippetEntityToJson s
-
-    S.put "/:id/rocks" $ do
-        _id <- S.param "id"
-        liftIO . runDb $ update (mkSnippetId _id) [SnippetRocks +=. 1]
-
-    S.put "/:id/sucks" $ do
-        _id <- S.param "id"
-        liftIO . runDb $ update (mkSnippetId _id) [SnippetSucks +=. 1]
 
 
 populate :: ReaderT SqlBackend (ResourceT (NoLoggingT IO)) ()
