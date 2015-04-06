@@ -4,7 +4,7 @@
   "authors": [
     "Matthieu Bulté <matthieu.bulte.06@gmail.com>"
   ],
-  "description": "Does this code suck, or does it rock?",
+  "description": "a web application for gathering feedback on small snippets of code",
   "license": "MIT",
   "homepage": "https://github.com/mtthieubulte/sucks-rocks",
   "private": true,

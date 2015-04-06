@@ -1,7 +1,7 @@
 {
   "name": "sucks-rocks",
   "version": "0.0.1",
-  "description": "Does this code suck, or does it rock?",
+  "description": "a web application for gathering feedback on small snippets of code",
   "author": "Matthieu Bulté",
   "license": "MIT",
   "devDependencies": {

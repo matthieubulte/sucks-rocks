@@ -1,6 +1,6 @@
 name:           sucks-rocks
 version:        0.0.1
-synopsis:       Does this code suck, or does it rock?
+synopsis:       a web application for gathering feedback on small snippets of code
 homepage:       https://github.com/mtthieubulte/sucks-rocks
 license:        MIT
 author:         Matthieu Bulté
