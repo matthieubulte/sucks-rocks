@@ -1,6 +1,7 @@
 module Types
     ( Action(..)
     , AppState(..)
+    , SnippetRecord()
     , Snippet(..)
     , State(..), loading, allSnippets, oneSnippet
     ) where
@@ -8,12 +9,14 @@ module Types
 import Data.Foreign
 import Data.Foreign.Class
 
-data Snippet = Snippet { id    :: Number
-                       , title :: String
-                       , code  :: String
-                       , sucks :: Number
-                       , rocks :: Number
-                       }
+type SnippetRecord =  { id    :: Number
+                      , title :: String
+                      , code  :: String
+                      , sucks :: Number
+                      , rocks :: Number
+                      }
+
+data Snippet = Snippet SnippetRecord
 
 instance submissionIsForeign :: IsForeign Snippet where
     read value = do

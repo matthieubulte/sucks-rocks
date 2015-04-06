@@ -41,16 +41,15 @@ renderOneSnippet context (Snippet snippet) props = T.div' [ code, information, c
                            ]
 
 -- State : All Snippets
-opinionRatio :: Snippet -> String
-opinionRatio (Snippet snippet) = (show snippet.rocks) ++ "/" ++ (show $ snippet.rocks + snippet.sucks)
+opinionRatio :: SnippetRecord -> String
+opinionRatio snippet = (show snippet.rocks) ++ "/" ++ (show $ snippet.rocks + snippet.sucks)
 
 renderAllSnippets :: forall props. T.Context State props Action -> [Snippet] -> props -> T.Html Action
 renderAllSnippets context snippets props = T.div' $ showSnippet <$> snippets
     where
         showSnippet :: Snippet -> T.Html _
-        showSnippet (Snippet snippet) = let snippet' = Snippet snippet
-                                         in T.div' [ T.text $ snippet.title ++ " - "
-                                                   , T.text (opinionRatio $ snippet')
-                                                   , T.button [ T.onClick context \_ -> LoadSnippet snippet.id ] [ T.text "Open" ]
-                                                   ]
+        showSnippet (Snippet snippet) = T.div' [ T.text $ snippet.title ++ " - "
+                                               , T.text (opinionRatio snippet)
+                                               , T.button [ T.onClick context \_ -> LoadSnippet snippet.id ] [ T.text "Open" ]
+                                               ]
 
