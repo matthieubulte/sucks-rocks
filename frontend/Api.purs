@@ -3,11 +3,11 @@ module Api
     , loadSnippets
     , voteSnippetSucks
     , voteSnippetRocks
+    , postNewSnippet
     ) where
 
 import Control.Monad.Eff
 import Control.Monad.Cont.Trans
-import Control.Monad.Maybe.Trans
 import Control.Monad.Trans
 import Control.Plus
 import Control.MonadPlus
@@ -17,8 +17,9 @@ import Data.Foreign.Class
 import Data.Maybe
 import Network
 import Types
+import Utils
 
-loadSnippet :: forall eff. Number -> MaybeT (ContT Unit (Eff eff)) Snippet
+loadSnippet :: forall eff. Number -> RequestStack eff Snippet
 loadSnippet id = do
     response <- lift <<< get' $ "/snippet/" ++ (show id)
     guard $ response.status == 200
@@ -42,3 +43,9 @@ voteSnippetSucks = voteSnippet "sucks"
 
 voteSnippetRocks :: forall eff. Number -> ContT Unit (Eff eff) Unit
 voteSnippetRocks = voteSnippet "rocks"
+
+postNewSnippet :: forall eff. NewSnippet -> RequestStack eff Number
+postNewSnippet (NewSnippet newSnippet) = do
+    response <- lift $ post "/snippet" [] (stringify newSnippet)
+    guard $ response.status == 200
+    either (const empty) return $ readJSON response.text :: F Number

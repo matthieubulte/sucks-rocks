@@ -1,24 +1,34 @@
 module Types
-    ( Action(..)
+    ( RequestStack()
+    , Action(..)
     , AppState(..)
     , SnippetRecord()
     , Snippet(..)
-    , State(..), loading, allSnippets, oneSnippet, snippetNotFound
+    , NewSnippetRecord()
+    , NewSnippet(..)
+    , State(..), loading, allSnippets, oneSnippet, error, creatingSnippet
     ) where
 
 import Data.Foreign
 import Data.Foreign.Class
+import Control.Monad.Maybe.Trans
+import Control.Monad.Eff
+import Control.Monad.Cont.Trans
+import Control.Monad.Trans
 
-type SnippetRecord =  { id    :: Number
-                      , title :: String
-                      , code  :: String
-                      , sucks :: Number
-                      , rocks :: Number
-                      }
+type RequestStack eff a = MaybeT (ContT Unit (Eff eff)) a
+
+-- Full Snippet
+type SnippetRecord = { id    :: Number
+                     , title :: String
+                     , code  :: String
+                     , sucks :: Number
+                     , rocks :: Number
+                     }
 
 data Snippet = Snippet SnippetRecord
 
-instance submissionIsForeign :: IsForeign Snippet where
+instance snippetIsForeign :: IsForeign Snippet where
     read value = do
         id    <- readProp "id"    value
         title <- readProp "title" value
@@ -27,15 +37,24 @@ instance submissionIsForeign :: IsForeign Snippet where
         rocks <- readProp "rocks" value
         return $ Snippet { id: id, title: title, code: code, sucks: sucks, rocks: rocks }
 
+-- User Created Snippet
+type NewSnippetRecord = { title :: String
+                        , code  :: String
+                        }
+
+data NewSnippet = NewSnippet NewSnippetRecord
+
 data Action = LoadAllSnippets
             | LoadSnippet Number
             | VoteSnippetRocks Snippet
             | VoteSnippetSucks Snippet
+            | PostNewSnippet NewSnippet
 
 data AppState = Loading
               | AllSnippets [Snippet]
               | OneSnippet Snippet
-              | SnippetNotFound Number
+              | Error
+              | CreatingSnippet
 
 data State = State AppState
 
@@ -48,5 +67,8 @@ allSnippets = State <<< AllSnippets
 oneSnippet :: Snippet -> State
 oneSnippet = State <<< OneSnippet
 
-snippetNotFound :: Number -> State
-snippetNotFound = State <<< SnippetNotFound
+error :: State
+error = State $ Error
+
+creatingSnippet :: State
+creatingSnippet = State CreatingSnippet
