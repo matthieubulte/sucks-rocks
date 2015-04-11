@@ -16,14 +16,14 @@
     "tests"
   ],
   "dependencies": {
-    "purescript-thermite": "~0.5.3",
-    "react": "~0.12.2",
-    "purescript-foreign": "~0.4.2"
-  },
-  "devDependencies": {
     "purescript-maybe": "~0.2.2",
     "purescript-transformers": "~0.5.4",
     "purescript-http": "~0.2.0",
-    "purescript-arrays": "~0.3.7"
+    "purescript-arrays": "~0.3.7",
+    "purescript-foreign": "~0.4.2",
+    "purescript-thermite": "~0.7.0"
+  },
+  "resolutions": {
+    "purescript-thermite": "~0.7.0"
   }
 }

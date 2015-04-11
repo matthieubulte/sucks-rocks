@@ -55,6 +55,7 @@ data NewSnippet = NewSnippet { title :: String
 instance FromJSON NewSnippet where
     parseJSON (Object v) = NewSnippet <$> v .: "title"
                                       <*> v .: "code"
+    parseJSON _          = empty
 
 mkSnippetId :: Int -> SnippetId
 mkSnippetId = toSqlKey . fromIntegral
