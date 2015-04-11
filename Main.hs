@@ -11,9 +11,9 @@
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Logger
 import Control.Monad.Trans.Resource (runResourceT, ResourceT)
-import Control.Monad.Trans.Reader
-import Data.Aeson (object, (.=), Value)
+import Data.Aeson (object, (.=), (.:), decode, FromJSON(..), Value(..))
 import Data.Functor
+import Control.Applicative
 import Database.Persist as P
 import Database.Persist.Sqlite
 import Database.Persist.TH
@@ -21,6 +21,7 @@ import Network.HTTP.Types
 import Network.Wai.Middleware.Static (staticPolicy, addBase)
 import System.Environment (getArgs)
 import Web.Scotty as S
+import qualified Data.Text.Lazy as T
 
 runDb :: SqlPersistT (ResourceT (NoLoggingT IO)) a -> IO a
 runDb = runNoLoggingT
@@ -47,13 +48,20 @@ snippetEntityToJson (Entity k s) = object [ "id"    .= fromSqlKey k
                                           , "sucks" .= snippetSucks s
                                           ]
 
+data NewSnippet = NewSnippet { title :: String
+                             , code  :: String
+                             }
+
+instance FromJSON NewSnippet where
+    parseJSON (Object v) = NewSnippet <$> v .: "title"
+                                      <*> v .: "code"
 
 mkSnippetId :: Int -> SnippetId
 mkSnippetId = toSqlKey . fromIntegral
 
 
-getSnippets :: Int -> Int -> IO [Entity Snippet]
-getSnippets l p = runDb $ selectList [] [LimitTo l, OffsetBy (l * (p-1))]
+getSnippets :: IO [Entity Snippet]
+getSnippets = runDb $ selectList [] []
 
 
 getSnippetById :: SnippetId -> IO (Maybe (Entity Snippet))
@@ -64,6 +72,10 @@ getSnippetById i = do
                   _     -> Nothing
 
 
+insertNewSnippet :: NewSnippet -> IO (Key Snippet)
+insertNewSnippet s = let snippet = Snippet (title s) (code s) 0 0
+                      in runDb $ insert snippet
+
 serve :: Int -> IO ()
 serve port = S.scotty port $ do
 
@@ -73,8 +85,20 @@ serve port = S.scotty port $ do
     S.get "/" $ S.file "static/index.html"
 
     S.get "/snippets" $ do
-      snippets <- liftIO $ getSnippets 10 0
+      snippets <- liftIO getSnippets
       S.json $ snippetEntityToJson <$> snippets
+
+    S.post "/snippet" $ do
+        reqBody <- body
+        let newSnippet = decode reqBody :: Maybe NewSnippet
+
+        case newSnippet of
+             Nothing -> status status400
+             Just s -> do
+                 _id <- liftIO $ insertNewSnippet s
+                 status status200
+                 S.text . T.pack . show $ fromSqlKey _id
+
 
     S.put "/snippet/:id/rocks" $ do
         _id <- S.param "id"
@@ -84,7 +108,6 @@ serve port = S.scotty port $ do
         _id <- S.param "id"
         liftIO . runDb $ update (mkSnippetId _id) [SnippetSucks +=. 1]
 
-
     S.get "/snippet/:id" $ do
         _id <- S.param "id"
         snippet <- liftIO $ getSnippetById (mkSnippetId _id)
@@ -93,19 +116,9 @@ serve port = S.scotty port $ do
              (Just s) -> S.json $ snippetEntityToJson s
 
 
-populate :: ReaderT SqlBackend (ResourceT (NoLoggingT IO)) ()
-populate = do
-    _ <- insert $ Snippet "title 1" "code 1" 0 0
-    _ <- insert $ Snippet "title 2" "code 2" 0 0
-    _ <- insert $ Snippet "title 3" "code 3" 0 0
-    _ <- insert $ Snippet "title 4" "code 4" 0 0
-    _ <- insert $ Snippet "title 5" "code 5" 0 0
-    return ()
-
 main :: IO ()
 main = do
     runDb $ runMigration migrateAll
-    runDb populate
 
     [port] <- getArgs
     serve (read port)
