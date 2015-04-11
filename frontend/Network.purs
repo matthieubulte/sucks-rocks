@@ -2,6 +2,7 @@ module Network
     ( Response()
     , get, get'
     , put, put'
+    , post, post'
     ) where
 
 import Control.Monad.Eff
@@ -57,3 +58,11 @@ put = send PUT
 
 put' :: forall eff. String -> ContT Unit (Eff eff) Response
 put' url = put url [] ""
+
+post :: forall eff. String -> [Header] -> String -> ContT Unit (Eff eff) Response
+post = send POST
+
+post' :: forall eff. String -> ContT Unit (Eff eff) Response
+post' url = post url [] ""
+
+
