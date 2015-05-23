@@ -1,7 +1,7 @@
 name:           sucks-rocks
 version:        0.0.1
 synopsis:       a web application for gathering feedback on small snippets of code
-homepage:       https://github.com/mtthieubulte/sucks-rocks
+homepage:       https://github.com/matthieubulte/sucks-rocks
 license:        MIT
 author:         Matthieu Bulté
 maintainer:     matthieu.bulte.06@gmail.com
